@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using MiniValidation;
 
 namespace MinimalHelpers.Validation;
 
-internal class ValidatorFilter<T>(IOptions<ValidationOptions> options) : IEndpointFilter where T : class
+internal class ValidatorFilter<T>(IValidationService validationService, IOptions<ValidationOptions> options) : IEndpointFilter where T : class
 {
     private readonly ValidationOptions validationOptions = options.Value;
 
@@ -16,20 +15,22 @@ internal class ValidatorFilter<T>(IOptions<ValidationOptions> options) : IEndpoi
             return TypedResults.BadRequest();
         }
 
-        var (isValid, errors) = await MiniValidator.TryValidateAsync(input);
-
-        if (isValid)
+        var validationResult = await validationService.ValidateAsync(input);
+        if (validationResult.IsValid)
         {
-            return await next(context);
+            return await next.Invoke(context);
         }
+
+        var errors = validationResult.Errors ?? new Dictionary<string, string[]>();
+        var httpContext = context.HttpContext;
 
         var result = TypedResults.Problem(
             statusCode: StatusCodes.Status400BadRequest,
-            instance: context.HttpContext.Request.Path,
+            instance: httpContext.Request.Path,
             title: validationOptions.ValidationErrorTitleMessageFactory?.Invoke(context, errors) ?? "One or more validation errors occurred",
             extensions: new Dictionary<string, object?>(StringComparer.Ordinal)
             {
-                ["traceId"] = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier,
+                ["traceId"] = Activity.Current?.Id ?? httpContext.TraceIdentifier,
                 ["errors"] = validationOptions.ErrorResponseFormat == ErrorResponseFormat.Default ? errors : errors.SelectMany(e => e.Value.Select(m => new { Name = e.Key, Message = m })).ToArray()
             }
         );

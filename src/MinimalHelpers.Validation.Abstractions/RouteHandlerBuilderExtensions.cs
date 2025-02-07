@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace MinimalHelpers.FluentValidation;
+namespace MinimalHelpers.Validation;
 
 /// <summary>
 /// Extension methods for <see cref="RouteHandlerBuilder"/> to add validation.
@@ -15,12 +15,12 @@ public static class RouteHandlerBuilderExtensions
     /// <typeparam name="T">The type of the object to validate.</typeparam>
     /// <param name="builder">The <see cref="RouteHandlerBuilder"/> to add validation filter to.</param>
     /// <returns>A <see cref="RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
-    /// <remarks>The validation is performed using <a href="https://fluentvalidation.net">FluentValidation</a>.</remarks>
-    /// <seealso cref="ValidatorFilter{T}"/>    
+    /// <remarks>The validation is performed with Data annotations, using <a href="https://github.com/DamianEdwards/MiniValidation">MiniValidation</a>.</remarks>
+    /// <seealso cref="ValidatorFilter{T}"/>
     public static RouteHandlerBuilder WithValidation<T>(this RouteHandlerBuilder builder) where T : class
     {
         builder.AddEndpointFilter<ValidatorFilter<T>>()
-           .ProducesValidationProblem();
+            .ProducesValidationProblem();
 
         return builder;
     }

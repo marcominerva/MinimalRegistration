@@ -1,4 +1,5 @@
 using FluentValidation;
+using MinimalHelpers.FluentValidation;
 using MinimalHelpers.Validation;
 using TinyHelpers.AspNetCore.OpenApi;
 
@@ -17,7 +18,9 @@ builder.Services.ConfigureValidation(options =>
 
     // The default is "One or more validation errors occurred"
     //options.ValidationErrorTitleMessageFactory = (context, errors) => $"There was {errors.Values.Sum(v => v.Length)} error(s)";
-});
+})
+//.WithMiniValidator();
+.WithFluentValidation();
 
 builder.Services.AddProblemDetails();
 

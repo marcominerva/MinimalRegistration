@@ -13,9 +13,9 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     /// <param name="configureOptions">The <see cref="Action{ValidationOptions}"/> to configure the validation options.</param>
     /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-    public static IServiceCollection ConfigureValidation(this IServiceCollection services, Action<ValidationOptions> configureOptions)
+    public static IMinimalValidationBuilder ConfigureValidation(this IServiceCollection services, Action<ValidationOptions> configureOptions)
     {
         services.Configure(configureOptions);
-        return services;
+        return new DefaultMinimalValidationBuilder(services);
     }
 }

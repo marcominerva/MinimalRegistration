@@ -1,4 +1,4 @@
-﻿using MinimalHelpers.FluentValidation;
+﻿using MinimalHelpers.Validation;
 
 namespace MinimalSample.Endpoints;
 
